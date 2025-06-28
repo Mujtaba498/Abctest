@@ -6,23 +6,51 @@ import Link from 'next/link';
 import { api } from '../../lib/api';
 import { Category } from '../../types/post';
 
+// Skeleton components to prevent layout shifts
+const SkeletonText = ({ className = '' }: { className?: string }) => (
+  <div className={`bg-zinc-700 animate-pulse rounded ${className}`}></div>
+);
+
+const SkeletonCategory = () => (
+  <div className="space-y-2">
+    <SkeletonText className="h-5 w-24" />
+    <div className="space-y-1">
+      <SkeletonText className="h-4 w-20" />
+      <SkeletonText className="h-4 w-16" />
+    </div>
+  </div>
+);
+
+const SkeletonNewsItem = () => (
+  <li>
+    <SkeletonText className="h-5 w-32 mb-1" />
+    <SkeletonText className="h-3 w-24" />
+  </li>
+);
+
 export default function Footer() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [footerContent, setFooterContent] = useState('');
   const [footerLoading, setFooterLoading] = useState(true);
   const [latestNews, setLatestNews] = useState<any[]>([]);
+  const [newsLoading, setNewsLoading] = useState(true);
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
 
   useEffect(() => {
     const fetchCategories = async () => {
+      setCategoriesLoading(true);
       try {
         const data = await api.get('/categories');
         setCategories(data);
       } catch (err) {
         setCategories([]);
+      } finally {
+        setCategoriesLoading(false);
       }
     };
     
     const fetchLatestNews = async () => {
+      setNewsLoading(true);
       try {
         const data = await api.get('/posts');
         // Get latest 2 published posts
@@ -34,6 +62,8 @@ export default function Footer() {
         setLatestNews(latest);
       } catch (err) {
         setLatestNews([]);
+      } finally {
+        setNewsLoading(false);
       }
     };
     
@@ -66,6 +96,9 @@ export default function Footer() {
   }
   const categoryTree = buildCategoryTree(categories);
 
+  // Default footer content to prevent layout shift
+  const defaultFooterContent = 'CRM est une plateforme d\'actualités professionnelle. Nous fournissons uniquement du contenu intéressant que vous apprécierez. Nous nous efforçons de livrer les meilleures nouvelles, en nous concentrant sur la fiabilité et les dernières mises à jour aux États-Unis et dans le monde entier.';
+
   return (
     <footer className="bg-zinc-800 border-t border-zinc-700 mt-16">
       {/* Top Row: Company Name and Nav */}
@@ -81,6 +114,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-b border-white w-full mt-2 mb-8"></div>
+      
       {/* Main Footer Content */}
       <div className="max-w-7xl mx-auto px-4 pb-8">
         {/* First Row: About Us and Subscribe */}
@@ -88,11 +122,19 @@ export default function Footer() {
           {/* About Us */}
           <div className="lg:col-span-2">
             <h3 className="font-bold text-xl mb-2 text-zinc-50">À propos de nous</h3>
-            <p className="text-sm text-zinc-300 mb-6">
-              {footerLoading
-                ? 'Chargement...'
-                : (footerContent || 'CRM est une plateforme d\'actualités professionnelle. Nous fournissons uniquement du contenu intéressant que vous apprécierez. Nous nous efforçons de livrer les meilleures nouvelles, en nous concentrant sur la fiabilité et les dernières mises à jour aux États-Unis et dans le monde entier.')}
-            </p>
+            <div className="text-sm text-zinc-300 mb-6 min-h-[120px]">
+              {footerLoading ? (
+                <div className="space-y-2">
+                  <SkeletonText className="h-4 w-full" />
+                  <SkeletonText className="h-4 w-full" />
+                  <SkeletonText className="h-4 w-3/4" />
+                  <SkeletonText className="h-4 w-full" />
+                  <SkeletonText className="h-4 w-2/3" />
+                </div>
+              ) : (
+                <p>{footerContent || defaultFooterContent}</p>
+              )}
+            </div>
             <div className="flex gap-4 text-2xl text-zinc-400">
               <a href="#" className="hover:text-white transition"><FaFacebookF /></a>
               <a href="#" className="hover:text-white transition"><FaInstagram /></a>
@@ -115,9 +157,14 @@ export default function Footer() {
           
           {/* Latest News */}
           <div>
-                            <h3 className="font-bold text-xl mb-2 text-zinc-50">Dernières nouvelles</h3>
-            <ul className="space-y-4">
-              {latestNews.length > 0 ? (
+            <h3 className="font-bold text-xl mb-2 text-zinc-50">Dernières nouvelles</h3>
+            <ul className="space-y-4 min-h-[160px]">
+              {newsLoading ? (
+                <>
+                  <SkeletonNewsItem />
+                  <SkeletonNewsItem />
+                </>
+              ) : latestNews.length > 0 ? (
                 latestNews.map((post, i) => (
                   <li key={post._id || post.id || i}>
                     <Link href={`/${post.slug}`} className="block font-bold text-zinc-50 hover:underline underline-offset-2 transition-all mb-1 hover:text-white">
@@ -142,12 +189,17 @@ export default function Footer() {
           </div>
         </div>
         
-        {/* Second Row: Categories - Full Width */}
-        {categories.length > 0 && (
-          <div className="border-t border-zinc-700 pt-8">
-            <h3 className="font-bold text-xl mb-4 text-zinc-50">Catégories</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-              {categoryTree.map(cat => (
+        {/* Second Row: Categories - Always render with fixed height to prevent layout shift */}
+        <div className="border-t border-zinc-700 pt-8">
+          <h3 className="font-bold text-xl mb-4 text-zinc-50">Catégories</h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 min-h-[120px]">
+            {categoriesLoading ? (
+              // Show skeleton categories
+              Array.from({ length: 6 }).map((_, i) => (
+                <SkeletonCategory key={i} />
+              ))
+            ) : categoryTree.length > 0 ? (
+              categoryTree.map(cat => (
                 <div key={cat._id} className="space-y-2">
                   <Link href={`/${cat.slug}`} className="hover:underline font-semibold text-zinc-200 hover:text-white block">
                     {cat.name}
@@ -164,11 +216,16 @@ export default function Footer() {
                     </ul>
                   )}
                 </div>
-              ))}
-            </div>
+              ))
+            ) : (
+              <div className="col-span-full text-zinc-500 text-center py-8">
+                Aucune catégorie disponible
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
+      
       {/* Bottom Bar */}
       <div className="border-t border-zinc-700 py-4 bg-zinc-800">
         <div className="max-w-7xl mx-auto px-4 text-center text-xs text-zinc-500">
