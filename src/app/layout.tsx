@@ -28,9 +28,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full w-full">
       <head>
-        {/* Preconnect to image CDN for faster loading */}
-        <link rel="preconnect" href="https://autopublisher-crm.s3.eu-north-1.amazonaws.com" />
+        {/* Preconnect to image CDNs for faster loading */}
+        <link rel="preconnect" href="https://autopublisher-crm.s3.eu-north-1.amazonaws.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://autopublisher-crm.s3.eu-north-1.amazonaws.com" />
+        <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
+        {/* Early hints for critical resources */}
+        <link rel="preload" href="/favicon.ico" as="image" type="image/x-icon" />
       </head>
       <body className={`${inter.className} h-full w-full m-0 p-0`}>
         <AuthProvider>

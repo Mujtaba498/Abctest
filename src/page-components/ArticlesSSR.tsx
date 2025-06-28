@@ -261,11 +261,17 @@ export default function ArticlesSSR({ initialData }: ArticlesSSRProps) {
 
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-zinc-900 w-full overflow-x-hidden">
-      {/* Preload the main story image for better LCP */}
+      {/* Preload critical images for better LCP */}
       {sections.length > 0 && sections[0].section[0] && getPostImage(sections[0].section[0]) && (
         <ImagePreloader 
           imageUrl={getPostImage(sections[0].section[0])!} 
-          priority={true} 
+          priority={true}
+          preloadMultiple={
+            // Preload first 3 images from the first section
+            sections[0].section.slice(0, 3)
+              .map(post => getPostImage(post))
+              .filter(Boolean) as string[]
+          }
         />
       )}
       <div className="flex-grow w-full">

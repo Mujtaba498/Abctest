@@ -20,7 +20,8 @@ const nextConfig = {
     domains: [
       'placehold.co',
       'firebasestorage.googleapis.com',
-      'certusimages.appspot.com'
+      'certusimages.appspot.com',
+      'autopublisher-crm.s3.eu-north-1.amazonaws.com'
     ],
     unoptimized: true // For static export if needed
   },
