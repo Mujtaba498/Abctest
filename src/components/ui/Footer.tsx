@@ -120,11 +120,49 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 pt-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 min-h-[80px]">
           <span className="text-4xl font-extrabold font-serif text-white">Handicap Internatioanl</span>
-          <nav className="flex flex-wrap gap-3 sm:gap-6 md:gap-8 font-semibold text-base">
-            <a href="#" className="hover:underline text-zinc-50 hover:text-white whitespace-nowrap">À propos</a>
-            <a href="#" className="hover:underline text-zinc-50 hover:text-white whitespace-nowrap">Contact</a>
-            <Link href="/pricing" className="hover:underline text-zinc-50 hover:text-white whitespace-nowrap">Tarifs</Link>
-            <a href="#" className="hover:underline text-zinc-50 hover:text-white whitespace-nowrap">Politique de confidentialité</a>
+          {/* Footer Navigation with Layout Shift Prevention */}
+          <nav 
+            className="flex flex-wrap gap-3 sm:gap-6 md:gap-8 font-semibold text-base min-h-[60px] items-start"
+            style={{ 
+              contain: 'layout style',
+              willChange: 'auto'
+            }}
+          >
+            {(categoriesLoading || isInitialRender) ? (
+              // Navigation skeleton to prevent layout shifts
+              <>
+                <div className="h-6 w-16 bg-zinc-700 rounded animate-pulse" />
+                <div className="h-6 w-20 bg-zinc-700 rounded animate-pulse" />
+                <div className="h-6 w-18 bg-zinc-700 rounded animate-pulse" />
+                <div className="h-6 w-22 bg-zinc-700 rounded animate-pulse" />
+                <div className="h-6 w-16 bg-zinc-700 rounded animate-pulse" />
+                <div className="h-6 w-24 bg-zinc-700 rounded animate-pulse" />
+              </>
+            ) : (
+              <>
+                {categories.length > 0 ? (
+                  categories.slice(0, 6).map((category) => (
+                    <Link
+                      key={category._id}
+                      href={`/${category.slug}`}
+                      className="text-zinc-300 hover:text-white transition-colors duration-200"
+                    >
+                      {category.name}
+                    </Link>
+                  ))
+                ) : (
+                  // Fallback content to maintain layout
+                  <>
+                    <span className="text-zinc-300">Actualités</span>
+                    <span className="text-zinc-300">Sport</span>
+                    <span className="text-zinc-300">Culture</span>
+                    <span className="text-zinc-300">Économie</span>
+                    <span className="text-zinc-300">Politique</span>
+                    <span className="text-zinc-300">International</span>
+                  </>
+                )}
+              </>
+            )}
           </nav>
         </div>
       </div>

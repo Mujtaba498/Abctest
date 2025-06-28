@@ -6,7 +6,12 @@ import { Toaster } from '@/components/ui/toaster';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import { PerformanceOptimizer } from '@/components/PerformanceOptimizer';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'arial']
+});
 
 export const metadata: Metadata = {
   title: 'CRM Next.js - Système CRM de Qualité Production',
@@ -28,12 +33,31 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full w-full">
       <head>
-        {/* Preconnect to image CDNs for faster loading */}
+        <link
+          rel="preload"
+          href="/_next/static/media/inter-latin-400-normal.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/_next/static/media/inter-latin-500-normal.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/_next/static/media/inter-latin-600-normal.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
         <link rel="preconnect" href="https://autopublisher-crm.s3.eu-north-1.amazonaws.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://autopublisher-crm.s3.eu-north-1.amazonaws.com" />
         <link rel="preconnect" href="https://firebasestorage.googleapis.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://firebasestorage.googleapis.com" />
-        {/* Early hints for critical resources */}
         <link rel="preload" href="/favicon.ico" as="image" type="image/x-icon" />
       </head>
       <body className={`${inter.className} h-full w-full m-0 p-0`}>
