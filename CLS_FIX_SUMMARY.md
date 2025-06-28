@@ -1,7 +1,15 @@
 # Footer CLS (Cumulative Layout Shift) Fix Summary
 
-## Problem Identified
-Google PageSpeed Insights reported a significant layout shift issue with a **layout shift score of 0.635** from the footer component:
+## Problem Identified (Updated)
+Google PageSpeed Insights continues to report layout shift issues from the footer component:
+
+**Current Issue:**
+- **Layout shift score: 0.658** (increased from previous 0.635)
+- Element: `footer.bg-zinc-800.border-t.border-zinc-700.mt-16`
+- Impact: Ongoing CLS affecting Core Web Vitals
+
+**Previous Issue:**
+- **Layout shift score: 0.635** from the footer component
 
 **Problematic Element:**
 - Element: `<footer class="bg-zinc-800 border-t border-zinc-700 mt-16">`
@@ -26,9 +34,45 @@ Google PageSpeed Insights reported a significant layout shift issue with a **lay
 - **News items**: Different title lengths and dates
 - **Category tree**: Dynamic subcategories with varying depths
 
-## Solutions Implemented
+## Solutions Implemented (Enhanced)
 
-### 1. Skeleton Loading Components
+### 1. Enhanced Footer Stability
+**Added comprehensive layout shift prevention:**
+
+```tsx
+// Fixed minimum heights for all containers
+<footer className="bg-zinc-800 border-t border-zinc-700 mt-16 min-h-[600px]" 
+  style={{ 
+    contain: 'layout style',
+    willChange: 'auto'
+  }}>
+  
+// Header section with reserved height
+<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 min-h-[80px]">
+
+// Main content with reserved height
+<div className="max-w-7xl mx-auto px-4 pb-8 min-h-[400px]">
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-8 min-h-[280px]">
+```
+
+### 2. Initial Render Protection
+**Added timing controls to prevent premature content changes:**
+
+```tsx
+const [isInitialRender, setIsInitialRender] = useState(true);
+
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setIsInitialRender(false);
+  }, 100); // Small delay to ensure stable initial render
+  return () => clearTimeout(timer);
+}, []);
+
+// Enhanced loading conditions
+{(footerLoading || isInitialRender) ? <SkeletonComponents /> : <ActualContent />}
+```
+
+### 3. Skeleton Loading Components
 **Added reusable skeleton components:**
 
 ```tsx
@@ -200,11 +244,14 @@ const defaultFooterContent = 'CRM est une plateforme d\'actualités professionne
 
 ## Expected Results
 
-### Layout Shift Elimination
-- **0.635 CLS score reduction** from footer component
-- **Stable page layout** during content loading
+### Layout Shift Elimination (Enhanced)
+- **Targeting 0.658 CLS score elimination** from footer component
+- **Fixed minimum heights** prevent any container collapse
+- **CSS containment** isolates layout changes within footer
+- **Initial render protection** prevents premature content swapping
+- **Stable page layout** during all loading phases
 - **No visible jumping** or content repositioning
-- **Smooth loading experience** with skeleton animations
+- **Smooth loading experience** with enhanced skeleton animations
 
 ### PageSpeed Insights Improvements
 - **Better CLS scores** in Core Web Vitals

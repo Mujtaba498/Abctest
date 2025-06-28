@@ -35,6 +35,15 @@ export default function Footer() {
   const [latestNews, setLatestNews] = useState<any[]>([]);
   const [newsLoading, setNewsLoading] = useState(true);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [isInitialRender, setIsInitialRender] = useState(true);
+
+  // Prevent layout shift by delaying content change
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialRender(false);
+    }, 100); // Small delay to ensure stable initial render
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -100,10 +109,16 @@ export default function Footer() {
   const defaultFooterContent = 'CRM est une plateforme d\'actualités professionnelle. Nous fournissons uniquement du contenu intéressant que vous apprécierez. Nous nous efforçons de livrer les meilleures nouvelles, en nous concentrant sur la fiabilité et les dernières mises à jour aux États-Unis et dans le monde entier.';
 
   return (
-    <footer className="bg-zinc-800 border-t border-zinc-700 mt-16">
+    <footer 
+      className="bg-zinc-800 border-t border-zinc-700 mt-16 min-h-[600px]" 
+      style={{ 
+        contain: 'layout style',
+        willChange: 'auto'
+      }}
+    >
       {/* Top Row: Company Name and Nav */}
       <div className="max-w-7xl mx-auto px-4 pt-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 min-h-[80px]">
           <span className="text-4xl font-extrabold font-serif text-white">Handicap Internatioanl</span>
           <nav className="flex flex-wrap gap-3 sm:gap-6 md:gap-8 font-semibold text-base">
             <a href="#" className="hover:underline text-zinc-50 hover:text-white whitespace-nowrap">À propos</a>
@@ -116,14 +131,14 @@ export default function Footer() {
       <div className="border-b border-white w-full mt-2 mb-8"></div>
       
       {/* Main Footer Content */}
-      <div className="max-w-7xl mx-auto px-4 pb-8">
+      <div className="max-w-7xl mx-auto px-4 pb-8 min-h-[400px]">
         {/* First Row: About Us and Subscribe */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-8 min-h-[280px]">
           {/* About Us */}
           <div className="lg:col-span-2">
             <h3 className="font-bold text-xl mb-2 text-zinc-50">À propos de nous</h3>
             <div className="text-sm text-zinc-300 mb-6 min-h-[120px]">
-              {footerLoading ? (
+              {(footerLoading || isInitialRender) ? (
                 <div className="space-y-2">
                   <SkeletonText className="h-4 w-full" />
                   <SkeletonText className="h-4 w-full" />
@@ -159,7 +174,7 @@ export default function Footer() {
           <div>
             <h3 className="font-bold text-xl mb-2 text-zinc-50">Dernières nouvelles</h3>
             <ul className="space-y-4 min-h-[160px]">
-              {newsLoading ? (
+              {(newsLoading || isInitialRender) ? (
                 <>
                   <SkeletonNewsItem />
                   <SkeletonNewsItem />
@@ -193,7 +208,7 @@ export default function Footer() {
         <div className="border-t border-zinc-700 pt-8">
           <h3 className="font-bold text-xl mb-4 text-zinc-50">Catégories</h3>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 min-h-[120px]">
-            {categoriesLoading ? (
+            {(categoriesLoading || isInitialRender) ? (
               // Show skeleton categories
               Array.from({ length: 6 }).map((_, i) => (
                 <SkeletonCategory key={i} />
